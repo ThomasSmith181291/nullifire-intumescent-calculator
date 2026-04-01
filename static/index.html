@@ -9,151 +9,89 @@
     <link rel="stylesheet" href="/static/css/app.css">
 </head>
 <body>
-    <div class="header">
+    <!-- Header -->
+    <header class="header">
         <h1>Nullifire Intumescent Calculator</h1>
-        <span class="project-name" id="header-project-name">No project loaded</span>
-        <div class="header-actions" id="header-actions" style="display:none">
-            <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white" id="btn-export-excel">Export Excel</button>
-            <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white" id="btn-export-pdf">PDF Report</button>
+        <span id="header-project" class="header-project">No project loaded</span>
+        <div id="header-btns" class="header-btns" style="display:none">
+            <button class="hbtn" id="btn-export-excel">Export Excel</button>
+            <button class="hbtn" id="btn-export-pdf">PDF Report</button>
         </div>
-    </div>
+    </header>
 
-    <div class="app-layout">
+    <!-- App -->
+    <div class="app">
         <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
+        <aside class="sidebar">
             <div class="btn-row">
-                <button class="btn btn-primary btn-sm" id="btn-new-project" style="flex:1">New Project</button>
-                <button class="btn btn-secondary btn-sm" id="btn-load-project" style="flex:1">Load</button>
+                <button class="btn btn-primary" id="btn-new" style="flex:1">New Project</button>
+                <button class="btn btn-secondary" id="btn-load" style="flex:1">Load</button>
             </div>
-
-            <div id="project-settings" style="display:none">
-                <h3>Project</h3>
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" id="inp-project-name">
+            <div id="panel-settings" style="display:none">
+                <div class="sb-section">
+                    <div class="sb-title">Project</div>
+                    <div class="field"><label>Name</label><input id="inp-name" type="text"></div>
+                    <div class="field"><label>Client</label><input id="inp-client" type="text"></div>
                 </div>
-                <div class="form-group">
-                    <label>Client</label>
-                    <input type="text" id="inp-project-client">
+                <div class="sb-section">
+                    <div class="sb-title">Fire Protection Defaults</div>
+                    <div class="field"><label>Fire Rating</label><select id="sel-fr"></select></div>
+                    <div class="field"><label>Failure Temp</label><select id="sel-ft"></select></div>
+                    <div class="field"><label>Steel Origin</label><select id="sel-origin"></select></div>
                 </div>
-
-                <h3>Defaults</h3>
-                <div class="form-group">
-                    <label>Fire Rating</label>
-                    <select id="sel-fire-rating"></select>
-                </div>
-                <div class="form-group">
-                    <label>Failure Temp</label>
-                    <select id="sel-failure-temp"></select>
-                </div>
-                <div class="form-group">
-                    <label>Steel Origin</label>
-                    <select id="sel-origin"></select>
-                </div>
-
-                <h3>Summary</h3>
-                <div id="sidebar-summary" class="sidebar-summary">
-                    <div class="summary-row"><span>Members</span><span id="ss-count">0</span></div>
-                    <div class="summary-row"><span>Area</span><span id="ss-area">0 m²</span></div>
-                    <div class="summary-row"><span>Litres</span><span id="ss-litres">0 L</span></div>
-                    <div class="summary-row"><span>Weight</span><span id="ss-weight">0 kg</span></div>
-                    <div class="summary-row">
-                        <span>Status</span>
-                        <span><span class="dot-ok">●</span><span id="ss-ok">0</span>
-                              <span class="dot-warn">●</span><span id="ss-warn">0</span>
-                              <span class="dot-exc">●</span><span id="ss-exc">0</span></span>
+                <div class="sb-section">
+                    <div class="sb-title">Summary</div>
+                    <div class="sb-summary">
+                        <div class="srow"><span>Members</span><b id="s-count">0</b></div>
+                        <div class="srow"><span>Total Area</span><b id="s-area">0 m²</b></div>
+                        <div class="srow"><span>Total Litres</span><b id="s-litres">0 L</b></div>
+                        <div class="srow"><span>Total Weight</span><b id="s-weight">0 kg</b></div>
+                        <div class="srow">
+                            <span>Status</span>
+                            <b><span class="dot-g">●</span><span id="s-ok">0</span>
+                               <span class="dot-a">●</span><span id="s-warn">0</span>
+                               <span class="dot-r">●</span><span id="s-exc">0</span></b>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </aside>
 
-        <!-- Main Content -->
-        <div class="main-content">
+        <!-- Main -->
+        <main class="main">
             <!-- Welcome -->
-            <div id="welcome-screen" class="welcome-screen">
-                <div class="welcome-content">
-                    <h2>Nullifire Intumescent Calculator</h2>
-                    <p>Structural Steel Fire Protection Specification</p>
-                    <div class="btn-row" style="justify-content:center;margin-top:20px">
-                        <button class="btn btn-primary" id="btn-welcome-new">New Project</button>
-                        <button class="btn btn-secondary" id="btn-welcome-load">Load Project</button>
-                    </div>
+            <div id="welcome" class="welcome">
+                <h2>Nullifire Intumescent Calculator</h2>
+                <p>Structural Steel Fire Protection Specification</p>
+                <div class="btn-row" style="margin-top:16px">
+                    <button class="btn btn-primary" id="btn-new2">New Project</button>
+                    <button class="btn btn-secondary" id="btn-load2">Load Project</button>
                 </div>
             </div>
 
             <!-- Work area -->
-            <div id="work-area" style="display:none">
-                <!-- Tabs -->
-                <div class="tab-bar">
-                    <button class="tab-btn active" data-tab="grid-tab">Grid Setup</button>
-                    <button class="tab-btn" data-tab="members-tab">Members</button>
+            <div id="work" class="work">
+                <div class="toolbar">
+                    <button class="btn btn-primary btn-sm" id="btn-add">+ Add Member</button>
+                    <button class="btn btn-secondary btn-sm" id="btn-import">Import CSV/Excel</button>
+                    <button class="btn btn-secondary btn-sm" id="btn-del" disabled>Delete Selected</button>
+                    <span class="toolbar-info" id="info-count"></span>
                 </div>
-
-                <!-- Grid Setup Tab -->
-                <div id="grid-tab" class="tab-content active">
-                    <div class="grid-setup-layout">
-                        <div class="grid-setup-forms">
-                            <!-- X Gridlines -->
-                            <div class="grid-table-section">
-                                <div class="section-header">
-                                    <h4>X Gridlines (→)</h4>
-                                    <button class="btn btn-sm btn-secondary" id="btn-add-x-row">+ Row</button>
-                                    <button class="btn btn-sm btn-primary" id="btn-save-x">Save</button>
-                                </div>
-                                <div id="x-grid-table" class="ag-theme-alpine mini-grid"></div>
-                            </div>
-                            <!-- Y Gridlines -->
-                            <div class="grid-table-section">
-                                <div class="section-header">
-                                    <h4>Y Gridlines (↑)</h4>
-                                    <button class="btn btn-sm btn-secondary" id="btn-add-y-row">+ Row</button>
-                                    <button class="btn btn-sm btn-primary" id="btn-save-y">Save</button>
-                                </div>
-                                <div id="y-grid-table" class="ag-theme-alpine mini-grid"></div>
-                            </div>
-                            <!-- Levels -->
-                            <div class="grid-table-section">
-                                <div class="section-header">
-                                    <h4>Levels</h4>
-                                    <button class="btn btn-sm btn-secondary" id="btn-add-level-row">+ Row</button>
-                                    <button class="btn btn-sm btn-primary" id="btn-save-levels">Save</button>
-                                </div>
-                                <div id="levels-table" class="ag-theme-alpine mini-grid"></div>
-                            </div>
-                        </div>
-                        <!-- 3D Preview -->
-                        <div class="grid-3d-preview">
-                            <div id="three-container" style="width:100%;height:100%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Members Tab -->
-                <div id="members-tab" class="tab-content">
-                    <div class="grid-toolbar">
-                        <button class="btn btn-primary btn-sm" id="btn-add-member">+ Add Member</button>
-                        <button class="btn btn-secondary btn-sm" id="btn-import">Import CSV/Excel</button>
-                        <button class="btn btn-secondary btn-sm" id="btn-delete-selected" disabled>Delete Selected</button>
-                        <span class="member-count" id="member-count"></span>
-                    </div>
-                    <div id="member-grid" class="ag-theme-alpine" style="flex:1"></div>
-                </div>
+                <div id="grid" class="ag-theme-alpine grid-box"></div>
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Product comparison panel -->
-    <div id="product-panel" class="product-panel" style="display:none">
-        <div class="product-panel-header">
-            <h3>Product Coverage</h3>
-            <button class="btn btn-sm btn-secondary" id="btn-close-panel">✕</button>
+    <div id="compare-panel" class="compare-panel">
+        <div class="cp-header">
+            <b>Product Coverage</b>
+            <button class="btn btn-sm btn-secondary" id="btn-close-cp">✕</button>
         </div>
-        <div id="product-panel-content"></div>
+        <div id="cp-body"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@35.2.0/dist/ag-grid-community.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.169.0/examples/js/controls/OrbitControls.js"></script>
     <script type="module" src="/static/js/app.js"></script>
 </body>
 </html>
