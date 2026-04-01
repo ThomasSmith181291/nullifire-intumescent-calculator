@@ -145,11 +145,12 @@ function renderShortlist() {
     }
     body.innerHTML = html;
 
-    // Click to add member instantly
+    // Click to add member — prompts for length and exposure
     body.querySelectorAll('.sl-item').forEach(el => {
         el.onclick = async (e) => {
             if (e.target.classList.contains('sl-remove')) return;
-            await quickAdd(+el.dataset.sid, el.dataset.prof);
+            const item = shortlist.find(s => s.section_id === +el.dataset.sid);
+            await quickAdd(+el.dataset.sid, el.dataset.prof, item?.serial_size || '');
         };
     });
 
@@ -164,24 +165,47 @@ function renderShortlist() {
     });
 }
 
-async function quickAdd(sectionId, hpProfileName) {
+async function quickAdd(sectionId, defaultProfileName, sectionName) {
     if (!project) return;
-    const ctx = getContextValues();
-    try {
-        const mem = await api.addMember(project.id, {
-            section_id: sectionId, hp_profile_name: hpProfileName,
-            quantity: 1, length_m: 0,
-            fire_rating_id: ctx.fire_rating_id, failure_temp_id: ctx.failure_temp_id,
-            zone: ctx.zone, level: ctx.level, member_type: 'beam',
-        });
-        if (mem && gridApi) {
-            gridApi.applyTransaction({add:[mem]}); updateSummary();
-            if (ctx.zone) usedZones.add(ctx.zone);
-            if (ctx.level) usedLevels.add(ctx.level);
-            updateDataLists();
-            toast(`Added ${mem.section_name} — ${mem.dft_mm?(mem.dft_mm*1000).toFixed(0)+'µm':'N/A'}`);
-        }
-    } catch(e) { toast(e.message, false); }
+
+    // Get available profiles for this section
+    const profs = await api.getSectionProfiles(sectionId, project.product_id);
+    const profOpts = profs.map(p =>
+        `<option value="${p.name}"${p.name===defaultProfileName?' selected':''}>${p.description}</option>`
+    ).join('');
+
+    const m = modal(`<h2 style="font-size:13px;margin-bottom:8px">${sectionName || 'Add Member'}</h2>
+        <div style="display:flex;gap:8px">
+            <div class="field" style="flex:1"><label>Exposure</label><select id="qa-exp">${profOpts}</select></div>
+            <div class="field" style="flex:1"><label>Length (m)</label><input type="number" id="qa-len" value="0" step="0.1" min="0" autofocus></div>
+            <div class="field" style="flex:0.6"><label>Qty</label><input type="number" id="qa-qty" value="1" min="1"></div>
+        </div>
+        <div class="btn-row"><button class="btn btn-secondary btn-sm" id="qa-x">Cancel</button><button class="btn btn-primary btn-sm" id="qa-ok">Add</button></div>`);
+
+    $('qa-x').onclick = () => m.remove();
+    $('qa-ok').onclick = async () => {
+        const ctx = getContextValues();
+        try {
+            const mem = await api.addMember(project.id, {
+                section_id: sectionId, hp_profile_name: $('qa-exp').value,
+                quantity: +$('qa-qty').value || 1, length_m: +$('qa-len').value || 0,
+                fire_rating_id: ctx.fire_rating_id, failure_temp_id: ctx.failure_temp_id,
+                zone: ctx.zone, level: ctx.level, member_type: 'beam',
+            });
+            if (mem && gridApi) {
+                gridApi.applyTransaction({add:[mem]}); updateSummary();
+                if (ctx.zone) usedZones.add(ctx.zone);
+                if (ctx.level) usedLevels.add(ctx.level);
+                updateDataLists();
+                toast(`Added ${mem.section_name} — ${mem.dft_mm?(mem.dft_mm*1000).toFixed(0)+'µm':'N/A'}`);
+            }
+            m.remove();
+        } catch(e) { toast(e.message, false); }
+    };
+    // Enter on length or qty triggers add
+    $('qa-len').onkeydown = e => { if(e.key==='Enter') $('qa-ok').click(); };
+    $('qa-qty').onkeydown = e => { if(e.key==='Enter') $('qa-ok').click(); };
+    $('qa-len').focus();
 }
 
 function saveShortlist() {
@@ -367,11 +391,12 @@ async function addMemberDialog() {
         <div style="display:flex;gap:8px"><div class="field" style="flex:1"><label>Qty</label><input type="number" id="d-qty" value="1" min="1"></div><div class="field" style="flex:1"><label>Length (m)</label><input type="number" id="d-len" value="0" step="0.1"></div></div>
         <div class="btn-row"><button class="btn btn-secondary" id="d-x">Cancel</button><button class="btn btn-primary" id="d-go" disabled>Add Member</button></div>`);
 
-    // Quick picks — click to add instantly and close
+    // Quick picks — click to prompt length/exposure then add
     m.querySelectorAll('.quick-pick').forEach(el => {
         el.onclick = async () => {
-            await quickAdd(+el.dataset.sid, el.dataset.prof);
             m.remove();
+            const item = shortlist.find(s => s.section_id === +el.dataset.sid);
+            await quickAdd(+el.dataset.sid, el.dataset.prof, item?.serial_size || '');
         };
     });
 
