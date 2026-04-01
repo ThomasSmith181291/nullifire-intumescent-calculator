@@ -4,6 +4,17 @@ from app.api import api_bp
 from app.services import section_service
 
 
+@api_bp.route('/sections/types')
+def get_steel_types():
+    return jsonify(section_service.get_steel_types())
+
+
+@api_bp.route('/sections/types/<int:type_id>')
+def get_sections_by_type(type_id):
+    origin_id = request.args.get('origin', type=int)
+    return jsonify(section_service.get_sections_by_type(type_id, origin_id))
+
+
 @api_bp.route('/sections/search')
 def search_sections():
     q = request.args.get('q', '').strip()

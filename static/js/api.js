@@ -6,6 +6,10 @@ async function fetchJson(url, options = {}) {
         ...options,
     });
     if (resp.status === 204) return null;
+    if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: resp.statusText }));
+        throw new Error(err.error || resp.statusText);
+    }
     return resp.json();
 }
 
@@ -18,36 +22,56 @@ export const api = {
     deleteProject: (id) => fetchJson(`/projects/${id}`, { method: 'DELETE' }),
 
     // Members
-    addMember: (projectId, data) => fetchJson(`/projects/${projectId}/members`, { method: 'POST', body: JSON.stringify(data) }),
-    updateMember: (projectId, memberId, data) => fetchJson(`/projects/${projectId}/members/${memberId}`, { method: 'PUT', body: JSON.stringify(data) }),
-    deleteMember: (projectId, memberId) => fetchJson(`/projects/${projectId}/members/${memberId}`, { method: 'DELETE' }),
-    batchDeleteMembers: (projectId, ids) => fetchJson(`/projects/${projectId}/members/batch-delete`, { method: 'POST', body: JSON.stringify({ ids }) }),
+    addMember: (pid, data) => fetchJson(`/projects/${pid}/members`, { method: 'POST', body: JSON.stringify(data) }),
+    updateMember: (pid, mid, data) => fetchJson(`/projects/${pid}/members/${mid}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteMember: (pid, mid) => fetchJson(`/projects/${pid}/members/${mid}`, { method: 'DELETE' }),
+    batchDeleteMembers: (pid, ids) => fetchJson(`/projects/${pid}/members/batch-delete`, { method: 'POST', body: JSON.stringify({ ids }) }),
 
-    // Reference data
+    // Sections
+    getSteelTypes: () => fetchJson('/sections/types'),
+    getSectionsByType: (typeId, origin) => {
+        let url = `/sections/types/${typeId}`;
+        if (origin) url += `?origin=${origin}`;
+        return fetchJson(url);
+    },
     searchSections: (q, origin) => {
         let url = `/sections/search?q=${encodeURIComponent(q)}`;
         if (origin) url += `&origin=${origin}`;
         return fetchJson(url);
     },
-    getSection: (id) => fetchJson(`/sections/${id}`),
-    getSectionProfiles: (sectionId, productId) => {
-        let url = `/sections/${sectionId}/profiles`;
+    getSectionProfiles: (id, productId) => {
+        let url = `/sections/${id}/profiles`;
         if (productId) url += `?product_id=${productId}`;
         return fetchJson(url);
     },
-    getSectionFactor: (sectionId, profile) => fetchJson(`/sections/${sectionId}/factor?profile=${encodeURIComponent(profile)}`),
 
     // Products
     getProducts: () => fetchJson('/products'),
-    getProduct: (id) => fetchJson(`/products/${id}`),
-    getProductFireRatings: (productId) => fetchJson(`/products/${productId}/fire-ratings`),
-    getProductFailureTemps: (productId, fireRatingId) => fetchJson(`/products/${productId}/failure-temps?fire_rating_id=${fireRatingId}`),
+    getProductFireRatings: (pid) => fetchJson(`/products/${pid}/fire-ratings`),
+    getProductFailureTemps: (pid, frId) => fetchJson(`/products/${pid}/failure-temps?fire_rating_id=${frId}`),
 
     // Origins
     getOrigins: () => fetchJson('/origins'),
 
     // DFT
     lookupDft: (data) => fetchJson('/dft/lookup', { method: 'POST', body: JSON.stringify(data) }),
+
+    // Summary
+    getProjectSummary: (pid) => fetchJson(`/projects/${pid}/summary`),
+
+    // Grid & Levels
+    getGridlines: (pid) => fetchJson(`/projects/${pid}/gridlines`),
+    addGridline: (pid, data) => fetchJson(`/projects/${pid}/gridlines`, { method: 'POST', body: JSON.stringify(data) }),
+    deleteGridline: (pid, gid) => fetchJson(`/projects/${pid}/gridlines/${gid}`, { method: 'DELETE' }),
+    getLevels: (pid) => fetchJson(`/projects/${pid}/levels`),
+    addLevel: (pid, data) => fetchJson(`/projects/${pid}/levels`, { method: 'POST', body: JSON.stringify(data) }),
+    deleteLevel: (pid, lid) => fetchJson(`/projects/${pid}/levels/${lid}`, { method: 'DELETE' }),
+    getSceneData: (pid) => fetchJson(`/projects/${pid}/scene`),
+
+    // Import/Export
+    exportExcelUrl: (pid) => `${BASE}/projects/${pid}/export/excel`,
+    exportPdfUrl: (pid) => `${BASE}/projects/${pid}/export/pdf`,
+    importMembers: (pid, members) => fetchJson(`/projects/${pid}/import`, { method: 'POST', body: JSON.stringify({ members }) }),
 
     // Health
     health: () => fetchJson('/health'),

@@ -1,6 +1,34 @@
 from app.db import get_ref_db
 
 
+def get_steel_types():
+    db = get_ref_db()
+    rows = db.execute('''
+        SELECT st.id, st.name, st.abbrev, COUNT(ss.id) as section_count
+        FROM steel_types st
+        LEFT JOIN steel_sections ss ON ss.steel_type_id = st.id
+        GROUP BY st.id
+        HAVING section_count > 0
+        ORDER BY st.sort_order
+    ''').fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_sections_by_type(steel_type_id, origin_id=None):
+    db = get_ref_db()
+    params = [steel_type_id]
+    sql = '''SELECT s.id, s.serial_size, s.depth, s.width, s.web_thickness,
+                    s.flange_thickness, s.weight, s.area, s.steel_type_id,
+                    st.name AS steel_type_name, st.abbrev AS steel_type_abbrev, s.origin_id
+             FROM steel_sections s JOIN steel_types st ON s.steel_type_id = st.id
+             WHERE s.steel_type_id = ?'''
+    if origin_id:
+        sql += ' AND s.origin_id = ?'
+        params.append(origin_id)
+    sql += ' ORDER BY s.group_sort, s.weight DESC'
+    return [dict(r) for r in db.execute(sql, params).fetchall()]
+
+
 def search_sections(query, origin_id=None, limit=50):
     db = get_ref_db()
     limit = min(limit, 100)
