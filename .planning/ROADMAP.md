@@ -23,7 +23,12 @@ Build a structural steel intumescent coating specification tool that replaces le
   2. DFT lookup for any valid product + section factor + fire rating + failure temp returns the correct thickness, matching legacy Steelcalc output
   3. Test harness runs against reference data and reports pass/fail with specific mismatches identified
   4. Application launches as a native desktop window via PyWebView with Flask serving content
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-PLAN-01.md — Flask app shell, database layer, PyWebView desktop wrapper
+- [ ] 01-PLAN-02.md — Steel section and product reference data API endpoints
+- [ ] 01-PLAN-03.md — DFT calculation engine and lookup API endpoint
+- [ ] 01-PLAN-04.md — DFT test harness with reference data validation
 
 ### Phase 2: Project & Member Entry
 **Goal**: Users can create projects and rapidly add steel members with typeahead search, getting instant DFT calculations as they type
@@ -80,7 +85,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. DFT Engine & Foundation | 0/TBD | Not started | - |
+| 1. DFT Engine & Foundation | 0/4 | Planning complete | - |
 | 2. Project & Member Entry | 0/TBD | Not started | - |
 | 3. Verification & Summary | 0/TBD | Not started | - |
 | 4. Import & Export | 0/TBD | Not started | - |
