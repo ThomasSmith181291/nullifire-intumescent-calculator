@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from flask import current_app
 
 from app.db import init_project_db, get_project_db
-from app.services import section_service, product_service, dft_service, calc_service
+from app.services import section_service, product_service, dft_service, calc_service, verification_service
 
 
 def _now():
@@ -241,6 +241,13 @@ def _compute_member(project, section_id, hp_profile_name,
         density=density_kg_per_litre,
     )
 
+    # Classify verification status (RAG)
+    rag_status = verification_service.classify_member_status(
+        dft_result.get('hp_over_a'),
+        dft_result.get('status', 'error'),
+        eff_product_id, eff_fr_id, eff_ft_id,
+    )
+
     return {
         'hp_over_a': dft_result.get('hp_over_a'),
         'heated_perimeter': dft_result.get('heated_perimeter'),
@@ -249,7 +256,7 @@ def _compute_member(project, section_id, hp_profile_name,
         'surface_area_m2': quantities['surface_area_m2'],
         'volume_litres': quantities['volume_litres'],
         'weight_kg': quantities['weight_kg'],
-        'status': dft_result.get('status', 'error'),
+        'status': rag_status,
     }
 
 
