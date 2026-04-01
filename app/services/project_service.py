@@ -100,7 +100,9 @@ def list_projects():
 
 
 def add_member(project_id, section_id, hp_profile_name, quantity=1, length_m=0.0,
-               zone='', level='', fire_rating_id=None, failure_temp_id=None, product_id=None):
+               zone='', level='', fire_rating_id=None, failure_temp_id=None, product_id=None,
+               member_type='beam', grid_from=None, grid_to=None,
+               grid_level_from=None, grid_level_to=None):
     db = get_project_db(project_id)
     if not db:
         return None
@@ -124,8 +126,9 @@ def add_member(project_id, section_id, hp_profile_name, quantity=1, length_m=0.0
          hp_over_a, heated_perimeter, dft_mm, final_dft_mm,
          quantity, length_m, surface_area_m2, volume_litres, weight_kg,
          zone, level, fire_rating_id, failure_temp_id, product_id,
-         status, sort_order, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         status, sort_order, created_at, member_type,
+         grid_from, grid_to, grid_level_from, grid_level_to)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (member_id, section_id, section['serial_size'],
           section.get('steel_type_abbrev', ''), hp_profile_name,
           computed['hp_over_a'], computed['heated_perimeter'],
@@ -133,7 +136,8 @@ def add_member(project_id, section_id, hp_profile_name, quantity=1, length_m=0.0
           quantity, length_m,
           computed['surface_area_m2'], computed['volume_litres'], computed['weight_kg'],
           zone, level, fire_rating_id, failure_temp_id, product_id,
-          computed['status'], 0, _now()))
+          computed['status'], 0, _now(), member_type,
+          grid_from, grid_to, grid_level_from, grid_level_to))
     db.commit()
 
     return _member_to_dict(db.execute('SELECT * FROM project_members WHERE id = ?', (member_id,)).fetchone())
@@ -149,7 +153,8 @@ def update_member(project_id, member_id, **kwargs):
         return None
 
     allowed = {'section_id', 'hp_profile_name', 'quantity', 'length_m', 'zone', 'level',
-               'fire_rating_id', 'failure_temp_id', 'product_id', 'sort_order'}
+               'fire_rating_id', 'failure_temp_id', 'product_id', 'sort_order',
+               'member_type', 'grid_from', 'grid_to', 'grid_level_from', 'grid_level_to'}
     updates = {k: v for k, v in kwargs.items() if k in allowed}
     if not updates:
         return _member_to_dict(member)

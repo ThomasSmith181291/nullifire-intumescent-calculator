@@ -54,9 +54,11 @@ CREATE TABLE IF NOT EXISTS project_members (
     status TEXT DEFAULT 'pending',
     sort_order INTEGER DEFAULT 0,
     created_at TEXT NOT NULL,
+    member_type TEXT DEFAULT 'beam',
     grid_from TEXT,
     grid_to TEXT,
-    grid_level TEXT
+    grid_level_from TEXT,
+    grid_level_to TEXT
 );
 CREATE TABLE IF NOT EXISTS gridlines (
     id TEXT PRIMARY KEY,

@@ -65,6 +65,53 @@ def delete_level(project_id, level_id):
     return '', 204
 
 
+@api_bp.route('/projects/<project_id>/gridlines/batch', methods=['POST'])
+def batch_add_gridlines(project_id):
+    data = request.get_json(silent=True)
+    if not data or 'gridlines' not in data:
+        return jsonify({'error': 'JSON body with gridlines array required'}), 400
+    results = grid_service.batch_add_gridlines(project_id, data['gridlines'])
+    return jsonify(results), 201
+
+
+@api_bp.route('/projects/<project_id>/gridlines/clear', methods=['POST'])
+def clear_gridlines(project_id):
+    grid_service.clear_gridlines(project_id)
+    return '', 204
+
+
+@api_bp.route('/projects/<project_id>/levels/batch', methods=['POST'])
+def batch_add_levels(project_id):
+    data = request.get_json(silent=True)
+    if not data or 'levels' not in data:
+        return jsonify({'error': 'JSON body with levels array required'}), 400
+    results = grid_service.batch_add_levels(project_id, data['levels'])
+    return jsonify(results), 201
+
+
+@api_bp.route('/projects/<project_id>/levels/clear', methods=['POST'])
+def clear_levels(project_id):
+    grid_service.clear_levels(project_id)
+    return '', 204
+
+
+@api_bp.route('/projects/<project_id>/grid/member-length', methods=['POST'])
+def calculate_member_length(project_id):
+    """Calculate 3D length between two grid points at (potentially different) levels."""
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({'error': 'JSON body required'}), 400
+    required = ['grid_from', 'grid_to', 'level_from', 'level_to']
+    missing = [f for f in required if f not in data]
+    if missing:
+        return jsonify({'error': f'Missing: {", ".join(missing)}'}), 400
+    length = grid_service.calculate_member_length(
+        project_id, data['grid_from'], data['grid_to'],
+        data['level_from'], data['level_to']
+    )
+    return jsonify({'length_m': length})
+
+
 @api_bp.route('/projects/<project_id>/scene')
 def get_scene_data(project_id):
     """Get complete 3D scene data (gridlines, levels, members, intersections)."""

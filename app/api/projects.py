@@ -80,6 +80,11 @@ def add_member(project_id):
         fire_rating_id=data.get('fire_rating_id'),
         failure_temp_id=data.get('failure_temp_id'),
         product_id=data.get('product_id'),
+        member_type=data.get('member_type', 'beam'),
+        grid_from=data.get('grid_from'),
+        grid_to=data.get('grid_to'),
+        grid_level_from=data.get('grid_level_from'),
+        grid_level_to=data.get('grid_level_to'),
     )
     if not member:
         return jsonify({'error': 'Project or section not found'}), 404
