@@ -7,7 +7,7 @@ Build a structural steel intumescent coating specification tool that replaces le
 ## Phases
 
 - [x] **Phase 1: DFT Engine & Foundation** - Flask API, SQLite database, validated DFT lookup chain, PyWebView shell *(completed 2026-04-01)*
-- [ ] **Phase 2: Project & Member Entry** - Project creation, fast typeahead section search, member table with live calculations
+- [x] **Phase 2: Project & Member Entry** - Project creation, fast typeahead section search, member table with live calculations *(completed 2026-04-01)*
 - [ ] **Phase 3: Verification & Summary** - RAG status per member, project totals, container optimization, zone/level subtotals
 - [ ] **Phase 4: Import & Export** - CSV/Excel import with column mapper, Quantifire Excel export, PDF specification report
 - [ ] **Phase 5: Structural Grid & 3D Preview** - Grid/level definitions, Three.js wireframe, bidirectional table-3D sync
