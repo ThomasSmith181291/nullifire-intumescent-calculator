@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="/static/css/app.css">
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <h1>Nullifire Intumescent Calculator</h1>
         <span id="header-project" class="header-project">No project loaded</span>
@@ -19,9 +18,8 @@
         </div>
     </header>
 
-    <!-- App -->
     <div class="app">
-        <!-- Sidebar -->
+        <!-- Left sidebar -->
         <aside class="sidebar">
             <div class="btn-row">
                 <button class="btn btn-primary" id="btn-new" style="flex:1">New Project</button>
@@ -32,11 +30,6 @@
                     <div class="sb-title">Project</div>
                     <div class="field"><label>Name</label><input id="inp-name" type="text"></div>
                     <div class="field"><label>Client</label><input id="inp-client" type="text"></div>
-                </div>
-                <div class="sb-section">
-                    <div class="sb-title">Fire Protection Defaults</div>
-                    <div class="field"><label>Fire Rating</label><select id="sel-fr"></select></div>
-                    <div class="field"><label>Failure Temp</label><select id="sel-ft"></select></div>
                     <div class="field"><label>Steel Origin</label><select id="sel-origin"></select></div>
                 </div>
                 <div class="sb-section">
@@ -57,9 +50,8 @@
             </div>
         </aside>
 
-        <!-- Main -->
+        <!-- Center -->
         <main class="main">
-            <!-- Welcome -->
             <div id="welcome" class="welcome">
                 <h2>Nullifire Intumescent Calculator</h2>
                 <p>Structural Steel Fire Protection Specification</p>
@@ -69,20 +61,60 @@
                 </div>
             </div>
 
-            <!-- Work area -->
             <div id="work" class="work">
+                <!-- Context bar -->
+                <div class="context-bar">
+                    <div class="cb-group">
+                        <label>Fire Rating</label>
+                        <select id="ctx-fr"></select>
+                    </div>
+                    <div class="cb-group">
+                        <label>Failure Temp</label>
+                        <select id="ctx-ft"></select>
+                    </div>
+                    <div class="cb-group">
+                        <label>Zone</label>
+                        <input type="text" id="ctx-zone" placeholder="e.g. Zone A" list="zone-list">
+                        <datalist id="zone-list"></datalist>
+                    </div>
+                    <div class="cb-group">
+                        <label>Level</label>
+                        <input type="text" id="ctx-level" placeholder="e.g. Ground" list="level-list">
+                        <datalist id="level-list"></datalist>
+                    </div>
+                </div>
+
+                <!-- Toolbar -->
                 <div class="toolbar">
                     <button class="btn btn-primary btn-sm" id="btn-add">+ Add Member</button>
                     <button class="btn btn-secondary btn-sm" id="btn-import">Import CSV/Excel</button>
                     <button class="btn btn-secondary btn-sm" id="btn-del" disabled>Delete Selected</button>
+                    <button class="btn btn-secondary btn-sm" id="btn-toggle-shortlist">Shortlist ▶</button>
                     <span class="toolbar-info" id="info-count"></span>
                 </div>
+
+                <!-- Grid -->
                 <div id="grid" class="ag-theme-alpine grid-box"></div>
             </div>
         </main>
+
+        <!-- Right panel: Section Shortlist -->
+        <aside id="shortlist-panel" class="shortlist-panel">
+            <div class="sp-header">
+                <b>Section Shortlist</b>
+                <button class="btn btn-sm btn-secondary" id="btn-close-shortlist">✕</button>
+            </div>
+            <div class="sp-actions">
+                <button class="btn btn-sm btn-primary" id="btn-add-to-shortlist" style="flex:1">+ Add Sections</button>
+            </div>
+            <div class="sp-hint">Click a section below to add it as a member using the context bar settings</div>
+            <div id="shortlist-body" class="sp-body">
+                <div class="muted" style="padding:12px;text-align:center">No sections in shortlist.<br>Click "+ Add Sections" to browse.</div>
+            </div>
+        </aside>
     </div>
 
-    <!-- Product comparison panel -->
+    <!-- Compare panel -->
     <div id="compare-panel" class="compare-panel">
         <div class="cp-header">
             <b>Product Coverage</b>
