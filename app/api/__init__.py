@@ -13,3 +13,8 @@ def health():
         return jsonify({'status': 'ok', 'db': 'connected', 'products': count})
     except Exception as e:
         return jsonify({'status': 'error', 'db': str(e)}), 500
+
+
+# Import route modules so decorators register on api_bp
+from app.api import sections  # noqa: F401, E402
+from app.api import products  # noqa: F401, E402
