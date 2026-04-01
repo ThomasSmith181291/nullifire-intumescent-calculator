@@ -126,9 +126,9 @@ def add_member(project_id, section_id, hp_profile_name, quantity=1, length_m=0.0
          hp_over_a, heated_perimeter, dft_mm, final_dft_mm,
          quantity, length_m, surface_area_m2, volume_litres, weight_kg,
          zone, level, fire_rating_id, failure_temp_id, product_id,
-         status, sort_order, created_at, member_type,
+         status, status_detail, sort_order, created_at, member_type,
          grid_from, grid_to, grid_level_from, grid_level_to)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (member_id, section_id, section['serial_size'],
           section.get('steel_type_abbrev', ''), hp_profile_name,
           computed['hp_over_a'], computed['heated_perimeter'],
@@ -136,7 +136,7 @@ def add_member(project_id, section_id, hp_profile_name, quantity=1, length_m=0.0
           quantity, length_m,
           computed['surface_area_m2'], computed['volume_litres'], computed['weight_kg'],
           zone, level, fire_rating_id, failure_temp_id, product_id,
-          computed['status'], 0, _now(), member_type,
+          computed['status'], computed.get('status_detail', ''), 0, _now(), member_type,
           grid_from, grid_to, grid_level_from, grid_level_to))
     db.commit()
 
@@ -253,6 +253,20 @@ def _compute_member(project, section_id, hp_profile_name,
         eff_product_id, eff_fr_id, eff_ft_id,
     )
 
+    # Build a human-readable status detail
+    dft_status = dft_result.get('status', 'error')
+    status_detail = ''
+    if dft_status == 'no_band_mapping':
+        status_detail = f"No DFT data for this section type with this fire rating. {dft_result.get('error', '')}"
+    elif dft_status == 'no_section_factor':
+        status_detail = 'No Hp/A section factor data available for this section/exposure combination'
+    elif dft_status == 'no_coverage':
+        status_detail = f"Hp/A value outside tested range. {dft_result.get('error', '')}"
+    elif dft_status == 'no_dft_data':
+        status_detail = f"No DFT data for this product/rating/temp combination. {dft_result.get('error', '')}"
+    elif dft_status == 'error':
+        status_detail = dft_result.get('error', 'Unknown error')
+
     return {
         'hp_over_a': dft_result.get('hp_over_a'),
         'heated_perimeter': dft_result.get('heated_perimeter'),
@@ -262,6 +276,7 @@ def _compute_member(project, section_id, hp_profile_name,
         'volume_litres': quantities['volume_litres'],
         'weight_kg': quantities['weight_kg'],
         'status': rag_status,
+        'status_detail': status_detail,
     }
 
 
@@ -283,10 +298,10 @@ def _recalculate_default_members(project_id):
         db.execute('''
             UPDATE project_members SET
                 hp_over_a=?, heated_perimeter=?, dft_mm=?, final_dft_mm=?,
-                surface_area_m2=?, volume_litres=?, weight_kg=?, status=?
+                surface_area_m2=?, volume_litres=?, weight_kg=?, status=?, status_detail=?
             WHERE id=?
         ''', (computed['hp_over_a'], computed['heated_perimeter'],
               computed['dft_mm'], computed['final_dft_mm'],
               computed['surface_area_m2'], computed['volume_litres'],
-              computed['weight_kg'], computed['status'], member['id']))
+              computed['weight_kg'], computed['status'], computed.get('status_detail', ''), member['id']))
     db.commit()

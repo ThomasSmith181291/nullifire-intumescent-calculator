@@ -311,7 +311,7 @@ function buildGrid() {
         {field:'zone', headerName:'Zone', minWidth:90, flex:0.7, editable:true},
         {field:'level', headerName:'Level', minWidth:80, flex:0.6, editable:true},
         {field:'status', headerName:'', minWidth:45, flex:0.3, suppressMenu:true,
-         cellRenderer:p=>`<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${SC[p.value]||SC.pending}" title="${p.value||''}"></span>`},
+         cellRenderer:p=>{const detail=p.data.status_detail||p.value||'';return `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${SC[p.value]||SC.pending};cursor:${detail?'help':'default'}" title="${detail}"></span>`;}},
         {headerName:'', minWidth:65, flex:0.4, suppressMenu:true,
          cellRenderer:()=>`<button class="btn btn-sm btn-secondary" style="padding:2px 5px;font-size:9px" data-act="cmp">Compare</button>`,
          onCellClicked:e=>{if(e.event.target.dataset.act==='cmp')showCompare(e.data);}},

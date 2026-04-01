@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS project_members (
     failure_temp_id INTEGER,
     product_id INTEGER,
     status TEXT DEFAULT 'pending',
+    status_detail TEXT DEFAULT '',
     sort_order INTEGER DEFAULT 0,
     created_at TEXT NOT NULL,
     member_type TEXT DEFAULT 'beam',
