@@ -10,7 +10,7 @@ Build a structural steel intumescent coating specification tool that replaces le
 - [x] **Phase 2: Project & Member Entry** - Project creation, fast typeahead section search, member table with live calculations *(completed 2026-04-01)*
 - [x] **Phase 3: Verification & Summary** - RAG status per member, project totals, container optimization, zone/level subtotals *(completed 2026-04-01)*
 - [x] **Phase 4: Import & Export** - CSV/Excel import with column mapper, Quantifire Excel export, PDF specification report *(completed 2026-04-01)*
-- [ ] **Phase 5: Structural Grid & 3D Preview** - Grid/level definitions, Three.js wireframe, bidirectional table-3D sync
+- [x] **Phase 5: Structural Grid & 3D Preview** - Grid/level definitions, Three.js wireframe, bidirectional table-3D sync *(completed 2026-04-01)*
 
 ## Phase Details
 
