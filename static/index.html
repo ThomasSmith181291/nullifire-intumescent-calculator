@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nullifire Intumescent Calculator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; background: #f5f5f5; }
+        .header { background: #E31937; color: white; padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+        .header h1 { font-size: 20px; font-weight: 600; }
+        .header .subtitle { font-size: 13px; opacity: 0.85; }
+        .content { padding: 24px; max-width: 1200px; margin: 0 auto; }
+        .status-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .status-card h2 { font-size: 16px; margin-bottom: 12px; color: #333; }
+        .status-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 14px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-dot.ok { background: #22c55e; }
+        .status-dot.error { background: #ef4444; }
+        .status-dot.loading { background: #f59e0b; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Nullifire Intumescent Calculator</h1>
+        <span class="subtitle">Structural Steel Fire Protection Specification</span>
+    </div>
+    <div class="content">
+        <div class="status-card">
+            <h2>System Status</h2>
+            <div id="status">
+                <div class="status-item">
+                    <span class="status-dot loading"></span>
+                    <span>Connecting...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        fetch('/api/health')
+            .then(r => r.json())
+            .then(data => {
+                const el = document.getElementById('status');
+                const ok = data.status === 'ok';
+                el.innerHTML = `
+                    <div class="status-item">
+                        <span class="status-dot ${ok ? 'ok' : 'error'}"></span>
+                        <span>API: ${data.status}</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-dot ${data.db === 'connected' ? 'ok' : 'error'}"></span>
+                        <span>Database: ${data.db}</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-dot ok"></span>
+                        <span>Products loaded: ${data.products || 0}</span>
+                    </div>
+                `;
+            })
+            .catch(err => {
+                document.getElementById('status').innerHTML = `
+                    <div class="status-item">
+                        <span class="status-dot error"></span>
+                        <span>Connection failed: ${err.message}</span>
+                    </div>
+                `;
+            });
+    </script>
+</body>
+</html>
