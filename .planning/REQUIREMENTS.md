@@ -26,7 +26,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **ENTRY-01**: User can search steel sections with typeahead across all 3,545 sections (<50ms response)
 - [ ] **ENTRY-02**: User can select exposure type (HP profile) for each member, filtered to valid profiles for that steel type
-- [ ] **ENTRY-03**: System auto-defaults exposure based on steel type (UB → 3-sided beam, UC → 4-sided column)
+- [ ] **ENTRY-03**: System auto-defaults exposure based on steel type (UB -> 3-sided beam, UC -> 4-sided column)
 - [ ] **ENTRY-04**: New members inherit fire rating and failure temp from project defaults
 - [ ] **ENTRY-05**: User can override fire rating and failure temp per member
 - [ ] **ENTRY-06**: User can set quantity, length, and zone/location per member
@@ -123,7 +123,54 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmapper) | | |
+| FOUND-01 | Phase 1: DFT Engine & Foundation | Pending |
+| FOUND-02 | Phase 1: DFT Engine & Foundation | Pending |
+| FOUND-03 | Phase 1: DFT Engine & Foundation | Pending |
+| FOUND-04 | Phase 1: DFT Engine & Foundation | Pending |
+| FOUND-05 | Phase 1: DFT Engine & Foundation | Pending |
+| PROJ-01 | Phase 2: Project & Member Entry | Pending |
+| PROJ-02 | Phase 2: Project & Member Entry | Pending |
+| PROJ-03 | Phase 2: Project & Member Entry | Pending |
+| PROJ-04 | Phase 2: Project & Member Entry | Pending |
+| ENTRY-01 | Phase 2: Project & Member Entry | Pending |
+| ENTRY-02 | Phase 2: Project & Member Entry | Pending |
+| ENTRY-03 | Phase 2: Project & Member Entry | Pending |
+| ENTRY-04 | Phase 2: Project & Member Entry | Pending |
+| ENTRY-05 | Phase 2: Project & Member Entry | Pending |
+| ENTRY-06 | Phase 2: Project & Member Entry | Pending |
+| ENTRY-07 | Phase 2: Project & Member Entry | Pending |
+| ENTRY-08 | Phase 2: Project & Member Entry | Pending |
+| ENTRY-09 | Phase 2: Project & Member Entry | Pending |
+| ENTRY-10 | Phase 2: Project & Member Entry | Pending |
+| CALC-01 | Phase 2: Project & Member Entry | Pending |
+| CALC-02 | Phase 2: Project & Member Entry | Pending |
+| CALC-03 | Phase 2: Project & Member Entry | Pending |
+| CALC-04 | Phase 2: Project & Member Entry | Pending |
+| CALC-05 | Phase 2: Project & Member Entry | Pending |
+| VER-01 | Phase 3: Verification & Summary | Pending |
+| VER-02 | Phase 3: Verification & Summary | Pending |
+| VER-03 | Phase 3: Verification & Summary | Pending |
+| SUM-01 | Phase 3: Verification & Summary | Pending |
+| SUM-02 | Phase 3: Verification & Summary | Pending |
+| SUM-03 | Phase 3: Verification & Summary | Pending |
+| SUM-04 | Phase 3: Verification & Summary | Pending |
+| IMP-01 | Phase 4: Import & Export | Pending |
+| IMP-02 | Phase 4: Import & Export | Pending |
+| IMP-03 | Phase 4: Import & Export | Pending |
+| IMP-04 | Phase 4: Import & Export | Pending |
+| IMP-05 | Phase 4: Import & Export | Pending |
+| EXP-01 | Phase 4: Import & Export | Pending |
+| EXP-02 | Phase 4: Import & Export | Pending |
+| EXP-03 | Phase 4: Import & Export | Pending |
+| GRID-01 | Phase 5: Structural Grid & 3D Preview | Pending |
+| GRID-02 | Phase 5: Structural Grid & 3D Preview | Pending |
+| GRID-03 | Phase 5: Structural Grid & 3D Preview | Pending |
+| GRID-04 | Phase 5: Structural Grid & 3D Preview | Pending |
+| 3D-01 | Phase 5: Structural Grid & 3D Preview | Pending |
+| 3D-02 | Phase 5: Structural Grid & 3D Preview | Pending |
+| 3D-03 | Phase 5: Structural Grid & 3D Preview | Pending |
+| 3D-04 | Phase 5: Structural Grid & 3D Preview | Pending |
+| 3D-05 | Phase 5: Structural Grid & 3D Preview | Pending |
 
 ---
 *Defined: 2026-04-01*
