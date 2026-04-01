@@ -53,7 +53,25 @@ CREATE TABLE IF NOT EXISTS project_members (
     product_id INTEGER,
     status TEXT DEFAULT 'pending',
     sort_order INTEGER DEFAULT 0,
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    grid_from TEXT,
+    grid_to TEXT,
+    grid_level TEXT
+);
+CREATE TABLE IF NOT EXISTS gridlines (
+    id TEXT PRIMARY KEY,
+    direction TEXT NOT NULL,
+    name TEXT NOT NULL,
+    position REAL NOT NULL,
+    sort_order INTEGER DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS levels (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    height REAL NOT NULL,
+    fire_rating_id INTEGER,
+    failure_temp_id INTEGER,
+    sort_order INTEGER DEFAULT 0
 );
 '''
 

@@ -22,3 +22,4 @@ from app.api import dft  # noqa: F401, E402
 from app.api import projects  # noqa: F401, E402
 from app.api import summary  # noqa: F401, E402
 from app.api import import_export  # noqa: F401, E402
+from app.api import grid  # noqa: F401, E402
