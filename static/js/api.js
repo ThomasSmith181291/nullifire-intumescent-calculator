@@ -62,11 +62,16 @@ export const api = {
     // Grid & Levels
     getGridlines: (pid) => fetchJson(`/projects/${pid}/gridlines`),
     addGridline: (pid, data) => fetchJson(`/projects/${pid}/gridlines`, { method: 'POST', body: JSON.stringify(data) }),
+    batchAddGridlines: (pid, gridlines) => fetchJson(`/projects/${pid}/gridlines/batch`, { method: 'POST', body: JSON.stringify({ gridlines }) }),
+    clearGridlines: (pid) => fetchJson(`/projects/${pid}/gridlines/clear`, { method: 'POST' }),
     deleteGridline: (pid, gid) => fetchJson(`/projects/${pid}/gridlines/${gid}`, { method: 'DELETE' }),
     getLevels: (pid) => fetchJson(`/projects/${pid}/levels`),
     addLevel: (pid, data) => fetchJson(`/projects/${pid}/levels`, { method: 'POST', body: JSON.stringify(data) }),
+    batchAddLevels: (pid, levels) => fetchJson(`/projects/${pid}/levels/batch`, { method: 'POST', body: JSON.stringify({ levels }) }),
+    clearLevels: (pid) => fetchJson(`/projects/${pid}/levels/clear`, { method: 'POST' }),
     deleteLevel: (pid, lid) => fetchJson(`/projects/${pid}/levels/${lid}`, { method: 'DELETE' }),
     getSceneData: (pid) => fetchJson(`/projects/${pid}/scene`),
+    calcMemberLength: (pid, data) => fetchJson(`/projects/${pid}/grid/member-length`, { method: 'POST', body: JSON.stringify(data) }),
 
     // Import/Export
     exportExcelUrl: (pid) => `${BASE}/projects/${pid}/export/excel`,

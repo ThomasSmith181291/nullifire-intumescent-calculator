@@ -12,6 +12,10 @@
     <div class="header">
         <h1>Nullifire Intumescent Calculator</h1>
         <span class="project-name" id="header-project-name">No project loaded</span>
+        <div class="header-actions" id="header-actions" style="display:none">
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white" id="btn-export-excel">Export Excel</button>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white" id="btn-export-pdf">PDF Report</button>
+        </div>
     </div>
 
     <div class="app-layout">
@@ -26,20 +30,20 @@
                 <h3>Project</h3>
                 <div class="form-group">
                     <label>Name</label>
-                    <input type="text" id="inp-project-name" placeholder="Project name">
+                    <input type="text" id="inp-project-name">
                 </div>
                 <div class="form-group">
                     <label>Client</label>
-                    <input type="text" id="inp-project-client" placeholder="Client name">
+                    <input type="text" id="inp-project-client">
                 </div>
 
-                <h3>Fire Protection Defaults</h3>
+                <h3>Defaults</h3>
                 <div class="form-group">
                     <label>Fire Rating</label>
                     <select id="sel-fire-rating"></select>
                 </div>
                 <div class="form-group">
-                    <label>Failure Temperature</label>
+                    <label>Failure Temp</label>
                     <select id="sel-failure-temp"></select>
                 </div>
                 <div class="form-group">
@@ -47,27 +51,25 @@
                     <select id="sel-origin"></select>
                 </div>
 
-                <h3>Grid & Levels</h3>
-                <div class="form-group">
-                    <label>Gridlines <button class="btn btn-sm btn-secondary" id="btn-add-gridline" style="float:right">+ Add</button></label>
-                    <div id="gridline-list" class="item-list"></div>
-                </div>
-                <div class="form-group">
-                    <label>Levels <button class="btn btn-sm btn-secondary" id="btn-add-level" style="float:right">+ Add</button></label>
-                    <div id="level-list" class="item-list"></div>
-                </div>
-
-                <h3>Export</h3>
-                <div class="btn-row">
-                    <button class="btn btn-primary btn-sm" id="btn-export-excel" style="flex:1">Excel</button>
-                    <button class="btn btn-secondary btn-sm" id="btn-export-pdf" style="flex:1">PDF Report</button>
+                <h3>Summary</h3>
+                <div id="sidebar-summary" class="sidebar-summary">
+                    <div class="summary-row"><span>Members</span><span id="ss-count">0</span></div>
+                    <div class="summary-row"><span>Area</span><span id="ss-area">0 m²</span></div>
+                    <div class="summary-row"><span>Litres</span><span id="ss-litres">0 L</span></div>
+                    <div class="summary-row"><span>Weight</span><span id="ss-weight">0 kg</span></div>
+                    <div class="summary-row">
+                        <span>Status</span>
+                        <span><span class="dot-ok">●</span><span id="ss-ok">0</span>
+                              <span class="dot-warn">●</span><span id="ss-warn">0</span>
+                              <span class="dot-exc">●</span><span id="ss-exc">0</span></span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Welcome screen (shown when no project) -->
+            <!-- Welcome -->
             <div id="welcome-screen" class="welcome-screen">
                 <div class="welcome-content">
                     <h2>Nullifire Intumescent Calculator</h2>
@@ -79,43 +81,79 @@
                 </div>
             </div>
 
-            <!-- Work area (shown when project loaded) -->
-            <div id="work-area" style="display:none;flex:1;display:flex;flex-direction:column">
-                <!-- Toolbar -->
-                <div class="grid-toolbar">
-                    <button class="btn btn-primary btn-sm" id="btn-add-member">+ Add Member</button>
-                    <button class="btn btn-secondary btn-sm" id="btn-import">Import CSV/Excel</button>
-                    <button class="btn btn-secondary btn-sm" id="btn-delete-selected" disabled>Delete Selected</button>
-                    <span class="member-count" id="member-count"></span>
+            <!-- Work area -->
+            <div id="work-area" style="display:none">
+                <!-- Tabs -->
+                <div class="tab-bar">
+                    <button class="tab-btn active" data-tab="grid-tab">Grid Setup</button>
+                    <button class="tab-btn" data-tab="members-tab">Members</button>
                 </div>
 
-                <!-- Main grid area -->
-                <div id="member-grid" class="ag-theme-alpine grid-container"></div>
+                <!-- Grid Setup Tab -->
+                <div id="grid-tab" class="tab-content active">
+                    <div class="grid-setup-layout">
+                        <div class="grid-setup-forms">
+                            <!-- X Gridlines -->
+                            <div class="grid-table-section">
+                                <div class="section-header">
+                                    <h4>X Gridlines (→)</h4>
+                                    <button class="btn btn-sm btn-secondary" id="btn-add-x-row">+ Row</button>
+                                    <button class="btn btn-sm btn-primary" id="btn-save-x">Save</button>
+                                </div>
+                                <div id="x-grid-table" class="ag-theme-alpine mini-grid"></div>
+                            </div>
+                            <!-- Y Gridlines -->
+                            <div class="grid-table-section">
+                                <div class="section-header">
+                                    <h4>Y Gridlines (↑)</h4>
+                                    <button class="btn btn-sm btn-secondary" id="btn-add-y-row">+ Row</button>
+                                    <button class="btn btn-sm btn-primary" id="btn-save-y">Save</button>
+                                </div>
+                                <div id="y-grid-table" class="ag-theme-alpine mini-grid"></div>
+                            </div>
+                            <!-- Levels -->
+                            <div class="grid-table-section">
+                                <div class="section-header">
+                                    <h4>Levels</h4>
+                                    <button class="btn btn-sm btn-secondary" id="btn-add-level-row">+ Row</button>
+                                    <button class="btn btn-sm btn-primary" id="btn-save-levels">Save</button>
+                                </div>
+                                <div id="levels-table" class="ag-theme-alpine mini-grid"></div>
+                            </div>
+                        </div>
+                        <!-- 3D Preview -->
+                        <div class="grid-3d-preview">
+                            <div id="three-container" style="width:100%;height:100%"></div>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Summary bar -->
-                <div class="summary-bar" id="summary-bar">
-                    <div class="summary-item"><span class="summary-label">Members:</span><span class="summary-value" id="sum-count">0</span></div>
-                    <div class="summary-item"><span class="summary-label">Area:</span><span class="summary-value" id="sum-area">0.0 m²</span></div>
-                    <div class="summary-item"><span class="summary-label">Litres:</span><span class="summary-value" id="sum-litres">0.0 L</span></div>
-                    <div class="summary-item"><span class="summary-label">Weight:</span><span class="summary-value" id="sum-weight">0.0 kg</span></div>
-                    <div class="summary-item"><span class="summary-label" style="color:var(--status-green)">●</span><span class="summary-value" id="sum-ok">0</span></div>
-                    <div class="summary-item"><span class="summary-label" style="color:var(--status-amber)">●</span><span class="summary-value" id="sum-warning">0</span></div>
-                    <div class="summary-item"><span class="summary-label" style="color:var(--status-red)">●</span><span class="summary-value" id="sum-exceeds">0</span></div>
+                <!-- Members Tab -->
+                <div id="members-tab" class="tab-content">
+                    <div class="grid-toolbar">
+                        <button class="btn btn-primary btn-sm" id="btn-add-member">+ Add Member</button>
+                        <button class="btn btn-secondary btn-sm" id="btn-import">Import CSV/Excel</button>
+                        <button class="btn btn-secondary btn-sm" id="btn-delete-selected" disabled>Delete Selected</button>
+                        <span class="member-count" id="member-count"></span>
+                    </div>
+                    <div id="member-grid" class="ag-theme-alpine" style="flex:1"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Product comparison panel (slides in from right) -->
+    <!-- Product comparison panel -->
     <div id="product-panel" class="product-panel" style="display:none">
         <div class="product-panel-header">
             <h3>Product Coverage</h3>
-            <button class="btn btn-sm btn-secondary" id="btn-close-product-panel">✕</button>
+            <button class="btn btn-sm btn-secondary" id="btn-close-panel">✕</button>
         </div>
         <div id="product-panel-content"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@35.2.0/dist/ag-grid-community.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.169.0/examples/js/controls/OrbitControls.js"></script>
     <script type="module" src="/static/js/app.js"></script>
 </body>
 </html>
