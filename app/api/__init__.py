@@ -18,3 +18,4 @@ def health():
 # Import route modules so decorators register on api_bp
 from app.api import sections  # noqa: F401, E402
 from app.api import products  # noqa: F401, E402
+from app.api import dft  # noqa: F401, E402
