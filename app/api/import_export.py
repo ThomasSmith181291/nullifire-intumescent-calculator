@@ -32,25 +32,24 @@ def parse_import():
 
 @api_bp.route('/import/validate', methods=['POST'])
 def validate_import():
-    """Validate parsed rows against a column mapping."""
+    """Validate parsed rows against a column mapping using fuzzy matching."""
     data = request.get_json(silent=True)
     if not data:
         return jsonify({'error': 'JSON body required'}), 400
 
     rows = data.get('rows', [])
     mapping = data.get('mapping', {})
-    # Convert string keys to int values
+    origin_id = data.get('origin_id')
     mapping = {k: int(v) for k, v in mapping.items()}
 
-    def section_lookup(query):
-        return section_service.search_sections(query, limit=1)
-
-    results = import_service.validate_import_rows(rows, mapping, section_lookup)
+    results = import_service.validate_import_rows(rows, mapping, origin_id)
     valid_count = sum(1 for r in results if r['valid'])
+    warning_count = sum(1 for r in results if r.get('warnings'))
 
     return jsonify({
         'results': results,
         'valid_count': valid_count,
+        'warning_count': warning_count,
         'total_count': len(results),
     })
 
@@ -92,6 +91,9 @@ def import_members(project_id):
                 length_m=m.get('length_m', 0),
                 zone=m.get('zone', ''),
                 level=m.get('level', ''),
+                fire_rating_id=m.get('fire_rating_id'),
+                failure_temp_id=m.get('failure_temp_id'),
+                member_type=m.get('member_type', 'beam'),
             )
             if member:
                 added.append(member)
