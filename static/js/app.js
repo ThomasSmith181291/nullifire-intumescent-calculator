@@ -454,20 +454,125 @@ async function showCompare(row) {
 // ── Import ──
 async function importDialog() {
     if(!project)return;
-    const m=modal(`<h2>Import Steel Schedule</h2><div class="field"><label>Upload CSV or Excel</label><input type="file" id="d-file" accept=".csv,.xlsx,.xls"></div><div id="d-prev" style="display:none"><div id="d-info" style="margin-bottom:5px;font-size:10px;color:var(--grey)"></div><div id="d-map" style="margin-bottom:6px"></div><div id="d-sample" style="max-height:100px;overflow:auto;font-size:9px;border:1px solid #ddd;border-radius:3px"></div></div><div class="btn-row"><button class="btn btn-secondary" id="d-x">Cancel</button><button class="btn btn-primary" id="d-go" disabled>Import</button></div>`);
-    let parsed=null;
-    $('d-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;const fd=new FormData();fd.append('file',file);const r=await fetch('/api/import/parse',{method:'POST',body:fd});parsed=await r.json();if(parsed.error){toast(parsed.error,false);return;}
-        $('d-prev').style.display='block';$('d-info').textContent=`${parsed.total_rows} rows, ${parsed.headers.length} columns`;
-        const fields=['section','quantity','length','zone','level'];
-        $('d-map').innerHTML='<label style="font-size:10px;font-weight:600">Column Mapping</label>'+fields.map(f=>`<div style="display:flex;gap:5px;align-items:center;margin:2px 0"><span style="width:50px;font-size:10px">${f}</span><select data-f="${f}" style="flex:1;font-size:10px;padding:2px"><option value="">Skip</option>${parsed.headers.map((h,i)=>`<option value="${i}"${parsed.suggested_mapping[f]===i?' selected':''}>${h}</option>`).join('')}</select></div>`).join('');
-        $('d-sample').innerHTML=`<table style="width:100%;border-collapse:collapse"><tr>${parsed.headers.map(h=>`<th style="padding:2px 3px;border-bottom:1px solid #ddd;text-align:left">${h}</th>`).join('')}</tr>${parsed.sample_rows.slice(0,3).map(r=>`<tr>${r.map(c=>`<td style="padding:1px 3px">${c}</td>`).join('')}</tr>`).join('')}</table>`;
-        $('d-go').disabled=false;};
+    const m=modal(`<h2>Import Steel Schedule</h2>
+        <div class="field"><label>Upload CSV or Excel</label><input type="file" id="d-file" accept=".csv,.xlsx,.xls"></div>
+        <div id="d-prev" style="display:none">
+            <div id="d-info" style="margin-bottom:5px;font-size:10px;color:var(--n500)"></div>
+            <div id="d-map" style="margin-bottom:6px"></div>
+            <div id="d-sample" style="max-height:100px;overflow:auto;font-size:9px;border:1px solid #ddd;border-radius:3px"></div>
+            <div id="d-validate-area" style="display:none;margin-top:8px">
+                <button class="btn btn-sm btn-navy" id="d-validate">Validate Mapping</button>
+                <span id="d-val-result" style="font-size:10px;margin-left:8px"></span>
+            </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-secondary" id="d-x">Cancel</button><button class="btn btn-primary" id="d-go" disabled>Import</button></div>`);
+
+    let parsed=null, validated=null;
+
+    $('d-file').onchange=async e=>{
+        const file=e.target.files[0]; if(!file)return;
+        const fd=new FormData(); fd.append('file',file);
+        const r=await fetch('/api/import/parse',{method:'POST',body:fd});
+        parsed=await r.json();
+        if(parsed.error){toast(parsed.error,false);return;}
+
+        $('d-prev').style.display='block';
+        $('d-info').textContent=`${parsed.total_rows} rows, ${parsed.headers.length} columns`;
+
+        // Column mapping — includes fire_rating and failure_temp
+        const fields=['section','quantity','length','fire_rating','failure_temp','zone','level','type'];
+        $('d-map').innerHTML='<label style="font-size:10px;font-weight:600">Column Mapping</label><div style="font-size:9px;color:var(--n400);margin-bottom:4px">Fuzzy matching handles variations like "UB 254x102x22", "60min", "550C"</div>'+
+            fields.map(f=>`<div style="display:flex;gap:5px;align-items:center;margin:2px 0">
+                <span style="width:70px;font-size:10px;font-weight:500">${f.replace('_',' ')}</span>
+                <select data-f="${f}" style="flex:1;font-size:10px;padding:2px">
+                    <option value="">— Skip —</option>
+                    ${parsed.headers.map((h,i)=>`<option value="${i}"${parsed.suggested_mapping[f]===i?' selected':''}>${h}</option>`).join('')}
+                </select></div>`).join('');
+
+        // Sample data
+        $('d-sample').innerHTML=`<table style="width:100%;border-collapse:collapse"><tr>${parsed.headers.map(h=>`<th style="padding:2px 3px;border-bottom:1px solid #ddd;text-align:left;font-size:9px">${h}</th>`).join('')}</tr>${parsed.sample_rows.slice(0,3).map(r=>`<tr>${r.map(c=>`<td style="padding:1px 3px;font-size:9px">${c}</td>`).join('')}</tr>`).join('')}</table>`;
+
+        $('d-validate-area').style.display='block';
+        $('d-go').disabled=true;
+        validated=null;
+    };
+
+    // Validate button — runs server-side fuzzy matching
+    if($('d-validate')) $('d-validate').onclick=async()=>{
+        if(!parsed)return;
+        const map={};
+        m.querySelectorAll('[data-f]').forEach(s=>{if(s.value!=='')map[s.dataset.f]=+s.value;});
+        if(map.section===undefined){toast('Map the Section column',false);return;}
+
+        $('d-val-result').textContent='Validating...';
+        $('d-val-result').style.color='var(--n500)';
+
+        const resp=await fetch('/api/import/validate',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({rows:parsed.all_rows, mapping:map, origin_id:project.origin_id})});
+        validated=await resp.json();
+
+        const vc=validated.valid_count, tc=validated.total_count, wc=validated.warning_count||0;
+        const failed=tc-vc;
+        let msg=`${vc}/${tc} valid`;
+        if(wc)msg+=`, ${wc} fuzzy matched`;
+        if(failed)msg+=`, ${failed} failed`;
+        $('d-val-result').textContent=msg;
+        $('d-val-result').style.color=failed?'var(--s-err)':'var(--s-ok)';
+
+        if(vc>0)$('d-go').disabled=false;
+    };
+
     $('d-x').onclick=()=>m.remove();
-    $('d-go').onclick=async()=>{if(!parsed)return;const map={};m.querySelectorAll('[data-f]').forEach(s=>{if(s.value!=='')map[s.dataset.f]=+s.value;});if(map.section===undefined){toast('Map Section column',false);return;}
+
+    $('d-go').onclick=async()=>{
+        if(!parsed)return;
         const ctx=getContextValues();
-        const members=[];for(const row of parsed.all_rows){const q=row[map.section];if(!q)continue;const res=await api.searchSections(q,project.origin_id);if(!res.length)continue;
-            members.push({section_id:res[0].id,quantity:map.quantity!==undefined?+row[map.quantity]||1:1,length_m:map.length!==undefined?+row[map.length]||0:0,
-                zone:map.zone!==undefined?row[map.zone]||'':ctx.zone,level:map.level!==undefined?row[map.level]||'':ctx.level});}
-        if(!members.length){toast('No valid members',false);return;}
-        const result=await api.importMembers(project.id,members);m.remove();project=await api.getProject(project.id);gridApi.setGridOption('rowData',project.members);updateSummary();toast(`Imported ${result.added_count} members`);};
+
+        // If validated, use the validated results (fuzzy-matched section IDs, fire ratings, etc.)
+        if(validated && validated.results){
+            const members=[];
+            for(const r of validated.results){
+                if(!r.valid || !r.parsed?.section)continue;
+                members.push({
+                    section_id: r.parsed.section.id,
+                    quantity: r.parsed.quantity||1,
+                    length_m: r.parsed.length_m||0,
+                    fire_rating_id: r.parsed.fire_rating_id||ctx.fire_rating_id,
+                    failure_temp_id: r.parsed.failure_temp_id||ctx.failure_temp_id,
+                    zone: r.parsed.zone||ctx.zone,
+                    level: r.parsed.level||ctx.level,
+                    member_type: r.parsed.member_type||'beam',
+                });
+            }
+            if(!members.length){toast('No valid members to import',false);return;}
+            const result=await api.importMembers(project.id,members);
+            m.remove();
+            project=await api.getProject(project.id);
+            gridApi.setGridOption('rowData',project.members);
+            updateSummary();
+            toast(`Imported ${result.added_count} members (fuzzy matched)`);
+        } else {
+            // Fallback: no validation run, use simple search per row
+            const map={};
+            m.querySelectorAll('[data-f]').forEach(s=>{if(s.value!=='')map[s.dataset.f]=+s.value;});
+            if(map.section===undefined){toast('Map Section column',false);return;}
+            const members=[];
+            for(const row of parsed.all_rows){
+                const q=row[map.section]; if(!q)continue;
+                const res=await api.searchSections(q,project.origin_id); if(!res.length)continue;
+                members.push({section_id:res[0].id,
+                    quantity:map.quantity!==undefined?+row[map.quantity]||1:1,
+                    length_m:map.length!==undefined?+row[map.length]||0:0,
+                    zone:map.zone!==undefined?row[map.zone]||'':ctx.zone,
+                    level:map.level!==undefined?row[map.level]||'':ctx.level});
+            }
+            if(!members.length){toast('No valid members',false);return;}
+            const result=await api.importMembers(project.id,members);
+            m.remove();
+            project=await api.getProject(project.id);
+            gridApi.setGridOption('rowData',project.members);
+            updateSummary();
+            toast(`Imported ${result.added_count} members`);
+        }
+    };
 }
