@@ -12,3 +12,5 @@ data/exporter.cs
 data/exporter.csproj
 data/bin/
 data/obj/
+data/projects/*.nfc
+!data/projects/.gitkeep

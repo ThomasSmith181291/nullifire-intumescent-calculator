@@ -1,13 +1,17 @@
 from flask import Flask
 from flask_cors import CORS
 
-from app.config import DevelopmentConfig
+import os
+from app.config import DevelopmentConfig, ProductionConfig
 from app.db import init_db
 
 
 def create_app(config_class=None):
     if config_class is None:
-        config_class = DevelopmentConfig
+        if os.environ.get('FLASK_ENV') == 'production' or os.environ.get('RENDER'):
+            config_class = ProductionConfig
+        else:
+            config_class = DevelopmentConfig
 
     app = Flask(
         __name__,

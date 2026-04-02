@@ -13,5 +13,11 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
 
+class ProductionConfig(Config):
+    DEBUG = False
+    # On Render/Railway, /tmp is writable
+    PROJECT_DB_DIR = os.environ.get('PROJECT_DB_DIR', os.path.join(BASE_DIR, 'data', 'projects'))
+
+
 class TestingConfig(Config):
     TESTING = True
