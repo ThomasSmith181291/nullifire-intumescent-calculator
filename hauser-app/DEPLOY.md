@@ -1,9 +1,14 @@
-# Hauser Python prototype deployment
+# Hauser demo deployment
 
-This folder must contain the files from `hauser-render-ready.zip` (the root of the ZIP): `app/main.py`, `app/review.py`, `app/importers.py`, `app/assemblies.py`, `app/static/index.html`, `app/static/review.html` and requirements. This manifest alone does not deploy the app.
+This is a **prototype** using sample data. Do not upload confidential customer drawings to a public demonstration deployment.
 
-Render build command: `cd hauser-app && pip install -r requirements.txt`
+1. Create a private GitHub repository named `hauser-estimator`.
+2. Upload the contents of this folder to the repository root (not the enclosing `hauser-mvp` directory).
+3. In Render, create a Web Service from the repository using Python runtime, build command `pip install -r requirements.txt`, and start command `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
+4. Select the free plan and Frankfurt region, and open `/review` on the resulting URL.
 
-Render start command: `cd hauser-app && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+The included `render.yaml` describes the same configuration for Blueprint deployments.
 
-For a public service, add authentication and persistent storage before accepting any customer drawings. This MVP is not production ready.
+## Limitations
+
+The free service filesystem is ephemeral. Do not rely on it for persistent estimates or uploaded drawings. The demo has not been security-hardened for public access and has no user authentication. Add authentication and persistent storage before handling real projects.
